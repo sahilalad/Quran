@@ -1,0 +1,98 @@
+Date : 2025-03-16 06:15:17
+Directory : e:\abqgemini2025\src
+Total : 62 files,  4468 codes, 271 comments, 659 blanks, all 5398 lines
+
+Languages
++----------------+------------+------------+------------+------------+------------+
+| language       | files      | code       | comment    | blank      | total      |
++----------------+------------+------------+------------+------------+------------+
+| JavaScript     |         50 |      4,129 |        244 |        580 |      4,953 |
+| CSS            |          2 |        236 |         18 |         60 |        314 |
+| XML            |          7 |         60 |          5 |          8 |         73 |
+| JavaScript JSX |          3 |         43 |          4 |         11 |         58 |
++----------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                             | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                |         62 |      4,468 |        271 |        659 |      5,398 |
+| . (Files)                                                        |          8 |        314 |         29 |         72 |        415 |
+| components                                                       |         40 |      3,837 |        191 |        522 |      4,550 |
+| components (Files)                                               |         32 |      3,338 |        166 |        451 |      3,955 |
+| components\NOTINUSE                                              |          2 |        188 |         12 |         26 |        226 |
+| components\stats                                                 |          6 |        311 |         13 |         45 |        369 |
+| contexts                                                         |          3 |        160 |         12 |         30 |        202 |
+| hooks                                                            |          1 |         20 |          1 |          9 |         30 |
+| icon                                                             |          9 |        102 |          9 |         19 |        130 |
+| utils                                                            |          1 |         35 |         29 |          7 |         71 |
++------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| filename                                                         | language       | code       | comment    | blank      | total      |
++------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| e:\abqgemini2025\src\App.css                                     | CSS            |         33 |          0 |          6 |         39 |
+| e:\abqgemini2025\src\App.js                                      | JavaScript     |         42 |          3 |          4 |         49 |
+| e:\abqgemini2025\src\App.test.js                                 | JavaScript     |          7 |          0 |          2 |          9 |
+| e:\abqgemini2025\src\components\ArabicReading.js                 | JavaScript     |        168 |         10 |         23 |        201 |
+| e:\abqgemini2025\src\components\AudioPlayer.js                   | JavaScript     |         45 |          4 |         11 |         60 |
+| e:\abqgemini2025\src\components\AudioPlayerDisable.js            | JavaScript     |         25 |          1 |          4 |         30 |
+| e:\abqgemini2025\src\components\Ayah.js                          | JavaScript     |        221 |          7 |         26 |        254 |
+| e:\abqgemini2025\src\components\AyahAudio.js                     | JavaScript     |        180 |         16 |         35 |        231 |
+| e:\abqgemini2025\src\components\Bookmark.js                      | JavaScript     |        154 |          7 |         23 |        184 |
+| e:\abqgemini2025\src\components\DebugProgress.js                 | JavaScript     |         11 |          1 |          3 |         15 |
+| e:\abqgemini2025\src\components\DirectJump.js                    | JavaScript     |        183 |          2 |         25 |        210 |
+| e:\abqgemini2025\src\components\FontSize.js                      | JavaScript     |         97 |          1 |         11 |        109 |
+| e:\abqgemini2025\src\components\Header.js                        | JavaScript     |         52 |          1 |          7 |         60 |
+| e:\abqgemini2025\src\components\Home.js                          | JavaScript     |        100 |          1 |         13 |        114 |
+| e:\abqgemini2025\src\components\HomeSurahBox.js                  | JavaScript     |         70 |          1 |          8 |         79 |
+| e:\abqgemini2025\src\components\LastReadPosition.js              | JavaScript     |         56 |          2 |          9 |         67 |
+| e:\abqgemini2025\src\components\NOTINUSE\ArabicReadingByRuku.js  | JavaScript     |        149 |         11 |         21 |        181 |
+| e:\abqgemini2025\src\components\NOTINUSE\TRASH_HomeReading.js    | JavaScript     |         39 |          1 |          5 |         45 |
+| e:\abqgemini2025\src\components\NavBar.js                        | JavaScript     |         91 |          6 |         12 |        109 |
+| e:\abqgemini2025\src\components\NavbarSurahDropdown.js           | JavaScript     |        140 |          3 |         17 |        160 |
+| e:\abqgemini2025\src\components\NextPrev.js                      | JavaScript     |         83 |          7 |         17 |        107 |
+| e:\abqgemini2025\src\components\Parah.js                         | JavaScript     |         87 |          2 |         14 |        103 |
+| e:\abqgemini2025\src\components\RecitationList.js                | JavaScript     |         91 |          3 |          8 |        102 |
+| e:\abqgemini2025\src\components\Sajda.js                         | JavaScript     |         81 |          2 |         12 |         95 |
+| e:\abqgemini2025\src\components\ScrollToTop.js                   | JavaScript     |         78 |          6 |          9 |         93 |
+| e:\abqgemini2025\src\components\SearchBar.js                     | JavaScript     |        228 |          1 |         23 |        252 |
+| e:\abqgemini2025\src\components\Settings.js                      | JavaScript     |         89 |          3 |          9 |        101 |
+| e:\abqgemini2025\src\components\Share.js                         | JavaScript     |        167 |          2 |         14 |        183 |
+| e:\abqgemini2025\src\components\StickyNav.js                     | JavaScript     |        107 |         22 |         13 |        142 |
+| e:\abqgemini2025\src\components\Suggestions.js                   | JavaScript     |         27 |          1 |          4 |         32 |
+| e:\abqgemini2025\src\components\SurahInfoBar.js                  | JavaScript     |         18 |          0 |          3 |         21 |
+| e:\abqgemini2025\src\components\SurahTrPage.js                   | JavaScript     |        372 |         19 |         56 |        447 |
+| e:\abqgemini2025\src\components\SurahTrPageHeader.js             | JavaScript     |         46 |         15 |          8 |         69 |
+| e:\abqgemini2025\src\components\Tafsir.js                        | JavaScript     |         85 |          4 |          9 |         98 |
+| e:\abqgemini2025\src\components\Theme.js                         | JavaScript     |         67 |         12 |         13 |         92 |
+| e:\abqgemini2025\src\components\TranslationSelector.js           | JavaScript     |        101 |          2 |          8 |        111 |
+| e:\abqgemini2025\src\components\loading.js                       | JavaScript     |         18 |          2 |          4 |         24 |
+| e:\abqgemini2025\src\components\stats\Activity.js                | JavaScript     |         16 |          6 |          6 |         28 |
+| e:\abqgemini2025\src\components\stats\CompletionProgress.js      | JavaScript     |         29 |          1 |          5 |         35 |
+| e:\abqgemini2025\src\components\stats\PeriodicalStats.js         | JavaScript     |         61 |          3 |          7 |         71 |
+| e:\abqgemini2025\src\components\stats\ReadingProgress.js         | JavaScript     |        127 |          1 |         13 |        141 |
+| e:\abqgemini2025\src\components\stats\ReadingProgressSettings.js | JavaScript     |         41 |          1 |          6 |         48 |
+| e:\abqgemini2025\src\components\stats\ReadingTimeStats.js        | JavaScript     |         37 |          1 |          8 |         46 |
+| e:\abqgemini2025\src\contexts\AudioContext.js                    | JavaScript     |         67 |         10 |         13 |         90 |
+| e:\abqgemini2025\src\contexts\ReadingProgressContext.js          | JavaScript     |         68 |          1 |         11 |         80 |
+| e:\abqgemini2025\src\contexts\TranslationContext.js              | JavaScript     |         25 |          1 |          6 |         32 |
+| e:\abqgemini2025\src\hooks\useScrollVisibility.js                | JavaScript     |         20 |          1 |          9 |         30 |
+| e:\abqgemini2025\src\icon\Bismillah.svg                          | XML            |         12 |          0 |          3 |         15 |
+| e:\abqgemini2025\src\icon\Bismillahnew.jsx                       | JavaScript JSX |         15 |          0 |          3 |         18 |
+| e:\abqgemini2025\src\icon\BookmarkAdd.jsx                        | JavaScript JSX |         14 |          2 |          4 |         20 |
+| e:\abqgemini2025\src\icon\Bookmarked.jsx                         | JavaScript JSX |         14 |          2 |          4 |         20 |
+| e:\abqgemini2025\src\icon\ExpandIcon.svg                         | XML            |         11 |          1 |          1 |         13 |
+| e:\abqgemini2025\src\icon\NCloseIcon.svg                         | XML            |          9 |          1 |          1 |         11 |
+| e:\abqgemini2025\src\icon\NDownArrowIcon.svg                     | XML            |          9 |          1 |          1 |         11 |
+| e:\abqgemini2025\src\icon\NForwardArrowIcon.svg                  | XML            |          9 |          1 |          1 |         11 |
+| e:\abqgemini2025\src\icon\TrashIcon.svg                          | XML            |          9 |          1 |          1 |         11 |
+| e:\abqgemini2025\src\index.css                                   | CSS            |        203 |         18 |         54 |        275 |
+| e:\abqgemini2025\src\index.js                                    | JavaScript     |         15 |          3 |          3 |         21 |
+| e:\abqgemini2025\src\logo.svg                                    | XML            |          1 |          0 |          0 |          1 |
+| e:\abqgemini2025\src\reportWebVitals.js                          | JavaScript     |         12 |          1 |          2 |         15 |
+| e:\abqgemini2025\src\setupTests.js                               | JavaScript     |          1 |          4 |          1 |          6 |
+| e:\abqgemini2025\src\utils\api.js                                | JavaScript     |         35 |         29 |          7 |         71 |
+| Total                                                            |                |      4,468 |        271 |        659 |      5,398 |
++------------------------------------------------------------------+----------------+------------+------------+------------+------------+

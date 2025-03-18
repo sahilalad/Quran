@@ -1,0 +1,215 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Google Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @apply transition-colors duration-300;
+}
+
+/* Import your custom Arabic font */
+@font-face {
+  font-family: 'AlQuran-IndoPak'; /* Replace with your font name */
+  src: url('./fonts/AlQuran-IndoPak-by-QuranWBW.v.4.2.2-WL.ttf') format('truetype'); /* Update the path and format */
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Apply the font to the font-arabic class */
+.font-arabic {
+  font-family: 'AlQuran-IndoPak';
+  direction: rtl;
+  text-align: right;
+}
+
+/* Import your custom Urdu font */
+@font-face {
+  font-family: 'Jameel-Urdu'; /* Replace with your font name */
+  src: url('./fonts/Jameel-Noori-Nastaleeq-Regular.ttf') format('truetype'); /* Update the path and format */
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Apply the font to the font-arabic class */
+.font-urdu {
+  font-family: 'Jameel-Urdu';
+  direction: rtl;
+  word-spacing: 1px;
+  text-align: justify;
+  line-height: 2;
+}
+
+.tran-ss {
+  font-family: 'Montserrat';
+  color: blue;
+  font-weight: bold;
+}
+
+.preformatted {
+  white-space: pre-line; 
+}
+
+.sticky-audio-player {
+  position: fixed;
+  bottom: 0; 
+  left: 0;
+  width: 100%; 
+  z-index: 100; /* Ensure it's above other elements */
+}
+
+/* Dark mode Css */
+.dark {
+  @apply bg-gray-800 text-gray-200;
+}
+
+.dark .font-arabic {
+  @apply text-teal-400;
+}
+
+.dark .font-arabic .sajda-word {
+  @apply text-red-500 !important;
+}
+
+.sajda-word {
+  @apply text-red-500 !important;
+}
+
+/* Dark mode styles for specific elements */
+.dark .surah-header { 
+  @apply bg-gray-700 text-gray-300;
+}
+
+.dark .mb-4.p-4.shadow-md.rounded-3xl { 
+  @apply bg-gray-700 text-gray-300;
+}
+
+.dark {
+  background-color: #1f2937; /* This is the same as bg-gray-800 */ 
+  @apply text-gray-200; 
+}
+
+.dark .text-white {
+  @apply text-gray-100;
+}
+
+.dark .text-gray-700 {
+  @apply text-gray-400;
+}
+
+.dark .bg-gray-200 {
+  @apply bg-gray-600;
+}
+
+.dark .hover:bg-gray-300 {
+  @apply hover:bg-gray-500;
+}
+
+.dark .border-gray-400 {
+  @apply border-gray-500;
+}
+
+.dark .text-gray-500 {
+  @apply text-gray-400;
+}
+
+.dark .hover:text-yellow-500 {
+  @apply hover:text-yellow-400;
+}
+
+.dark .bg-gray-100 {
+  @apply bg-gray-600;
+}
+
+.dark .surah-header { 
+  @apply bg-gray-700 text-gray-300; /* Add text-gray-300 here */
+}
+
+.dark .surah-header h2 { /* More specific selector */
+  @apply text-gray-100;
+}
+
+.dark .surah-header .diret-jump p { /* More specific selector */
+  @apply text-gray-300;
+}
+
+.dark .surah-header-inner-info p { /* More specific selector */
+  @apply text-gray-300;
+}
+
+.dark .surah-header-inner-info span { /* More specific selector */
+  @apply text-gray-300;
+}
+
+.dark .mb-4.p-4.shadow-md.rounded-3xl { 
+  @apply bg-gray-700; /* Add text-gray-300 here */
+}
+
+/*.dark .mb-4.p-4.shadow-md.rounded-3xl p { /* More specific selector */
+/*  @apply text-gray-300;
+}*/
+
+.dark .text-gray-900 { /* Target text-gray-900 in dark mode */
+  @apply text-gray-300; 
+}
+
+.dark .surah-box {
+  @apply bg-gray-700 text-gray-300 hover:bg-teal-500;
+}
+
+.dark .bismillah-text { /* Target bismillah-text in dark mode */
+  @apply text-teal-400;
+}
+
+.bismillah.text-center {
+  text-align: center !important;
+}
+
+:root {
+  --arabic-font-size: 26px;
+  --urdu-font-size: 26px;
+  --english-font-size: 16px;
+  --gujarati-font-size: 16px;
+}
+
+/* Apply font sizes */
+.arabic-text {
+  font-size: var(--arabic-font-size);
+}
+
+.gujarati-text {
+  font-size: var(--gujarati-font-size);
+}
+
+.urdu-text {
+  font-size: var(--urdu-font-size);
+}
+
+.english-text {
+  font-size: var(--english-font-size);
+}
+
+.transition-container {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.transition-container.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.transition-container.fade-out {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+
+code {
+  font-family: source-code-pro, Montserrat, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}

@@ -1,0 +1,186 @@
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { Link } from "react-router-dom";
+import { axiosGet } from "../utils/api"; 
+
+const SearchBar = () => {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const dropdownRef = useRef(null);
+
+  // ✅ Normalize & Remove Diacritics for Better Matching
+  const normalizeText = (text) => text?.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase() || "";
+
+  // ✅ API call function optimized with useCallback
+  const fetchResults = useCallback(async () => {
+    if (!query.trim()) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const data = await axiosGet("/search", { query });
+      setResults(data);
+      setIsOpen(true);
+    } catch (err) {
+      console.error("Search API Error:", err);
+      setError("Error fetching results");
+    } finally {
+      setLoading(false);
+    }
+  }, [query]);
+
+  // ✅ Debounce API calls (Prevents excessive requests)
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (query.length > 2) {
+        fetchResults();
+      } else {
+        setResults([]);
+        setIsOpen(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounce);
+  }, [query, fetchResults]);
+
+  // ✅ Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // ✅ Handle "Enter" key press
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      fetchResults();
+    }
+  };
+
+  return (
+    <div className="relative w-full max-w-lg mx-auto" ref={dropdownRef}>
+      {/* Search Input + Button */}
+      <div className="flex items-center border border-gray-300 rounded-3xl shadow-sm overflow-hidden bg-white">
+        <input
+          type="text"
+          className="w-full px-4 py-2 focus:ring focus:ring-blue-300 transition-all outline-none"
+          placeholder="Search Ayah, Translation, or Tafsir..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyPress={handleKeyPress}
+        />
+        <button
+          onClick={fetchResults}
+          className="bg-blue-500 text-white px-4 py-2 flex items-center justify-center hover:bg-blue-600 transition"
+          aria-label="Search"
+        >
+          🔍
+        </button>
+      </div>
+
+      {/* Loading Indicator */}
+      {loading && <p className="mt-2 text-sm text-gray-500 animate-pulse">Loading...</p>}
+
+      {/* Error Message */}
+      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+
+      {/* Search Results Dropdown */}
+      {isOpen && results.length > 0 && (
+        <ul className="absolute w-full mt-2 bg-white border border-gray-300 rounded-3xl shadow-lg max-h-60 overflow-y-auto">
+          {results.map((item, index) => (
+            <SearchResultItem key={index} item={item} query={query} normalizeText={normalizeText} />
+          ))}
+        </ul>
+      )}
+
+      {/* No Results Found */}
+      {isOpen && results.length === 0 && query.length > 2 && !loading && (
+        <p className="mt-2 text-sm text-gray-500">No results found.</p>
+      )}
+    </div>
+  );
+};
+
+/**
+ * ✅ Extracted Search Result Item Component
+ * - Shows `(Tafsir)` next to Surah if result is from Tafsir
+ * - Displays Tafsir in search results
+ * - Limits text to 2 lines around the searched word
+ */
+const SearchResultItem = ({ item, query, normalizeText }) => {
+  const normalizedQuery = normalizeText(query);
+  const normalizedArabic = normalizeText(item.arabic_text);
+  const normalizedTranslation = normalizeText(item.translation_gujarati || item.translation_english || item.translation_urdu);
+  const normalizedTafsir = normalizeText(item.tafsir_gujarati || item.tafsir_english || item.tafsir_urdu);
+
+  const isTafsir = normalizedTafsir.includes(normalizedQuery); // ✅ Check if result is from Tafsir
+  const showArabic = normalizedArabic.includes(normalizedQuery); // ✅ Show Arabic only if searched
+  const highlightedTranslation = useMemo(() => highlightText(item.translation_gujarati || item.translation_english || item.translation_urdu, query, normalizeText, true), [item.translation_gujarati, item.translation_english, item.translation_urdu, query, normalizeText]);
+  const highlightedTafsir = useMemo(() => highlightText(item.tafsir_gujarati || item.tafsir_english || item.tafsir_urdu, query, normalizeText, true), [item.tafsir_gujarati, item.tafsir_english, item.tafsir_urdu, query, normalizeText]);
+
+  return (
+    <li className="px-4 py-2 hover:bg-gray-100 transition">
+      <Link to={`/surah/${item.surah_id}#ayah-${item.ayah_id}`}>
+        <p className="text-xs text-gray-400">
+          {item.ayah_id} {item.surah_name}
+        </p>
+
+        {/* ✅ Show Arabic text only if searched */}
+        {showArabic && <div className="font-arabic text-blue-600 text-2xl">{item.arabic_text}</div>}
+
+        {/* ✅ Show only 2 lines (1 before, 1 after) around the searched term */}
+        <p className="text-sm text-gray-600">{highlightedTranslation}</p>
+
+        {/* ✅ Show Surah number & `(Tafsir)` if result is from Tafsir */}
+        {isTafsir && (
+          <>
+            <p className="text-xs text-gray-400">
+              In Tafsir of {item.ayah_id} (Tafsir)
+            </p>
+            <p className="text-sm text-gray-500 italic">{highlightedTafsir}</p>
+          </>
+        )}
+      </Link>
+    </li>
+  );
+};
+
+/**
+ * ✅ Utility Function: Highlights search term in results & Shows 2 lines (1 before, 1 after)
+ */
+const highlightText = (text, highlight, normalizeText, limitText = false) => {
+  if (!text) return "";
+
+  const normalizedHighlight = normalizeText(highlight);
+  const normalizedText = normalizeText(text);
+  const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+
+  if (limitText) {
+    const index = parts.findIndex(part => normalizeText(part) === normalizedHighlight);
+    if (index === -1) return text; // If not found, return original text
+
+    // ✅ Get 1 line before & 1 line after the searched term
+    const before = index > 0 ? parts[index - 1] : "";
+    const after = index < parts.length - 1 ? parts[index + 1] : "";
+
+    return (
+      <>
+        {before && "... "}
+        <b className="text-blue-500">{parts[index]}</b>
+        {after && " ..."}
+      </>
+    );
+  }
+
+  return parts.map((part, index) =>
+    normalizeText(part) === normalizedHighlight ? <b key={index} className="text-blue-500">{part}</b> : part
+  );
+};
+
+export default SearchBar;

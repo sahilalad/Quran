@@ -1,0 +1,286 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Body styling */
+body {
+  margin: 0;
+  font-family: 'Google Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @apply transition-colors duration-300;
+}
+
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rasa&display=swap');
+
+
+
+/* Import Custom Fonts with font-display for performance */
+@font-face {
+  font-family: 'AlQuran-IndoPak';
+  src: url('./fonts/AlQuran-IndoPak-by-QuranWBW.v.4.2.2-WL.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Jameel-Urdu';
+  src: url('./fonts/Jameel-Noori-Nastaleeq-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Madinah-Nastaleeq';
+  src: url('./fonts/Indopak Nastaleeq font.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF;
+}
+
+@font-face {
+  font-family: "MuhammadiBold";
+  font-weight: normal;
+  font-style: normal;
+  src: url("./fonts/MUHAMMADIBold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "IndoPak";
+  font-weight: normal;
+  font-style: normal;
+  src: url("./fonts/IndoPak.ttf") format("truetype");
+}
+
+/* Classes for custom fonts */
+.font-arabic {
+  font-family: 'AlQuran-IndoPak','Open Sans', Arial, sans-serif;
+  direction: rtl;
+  text-align: right;
+}
+
+.font-urdu {
+  font-family: 'Jameel-Urdu';
+  direction: rtl;
+  text-align: justify;
+  word-spacing: 1px;
+  line-height: 2;
+}
+
+.font-madinah {
+  font-family: 'Madinah-Nastaleeq' !important;
+  direction: rtl;
+/*  text-align: justify; */
+  word-spacing: 1px;
+  line-height: 2;
+}
+
+.font-muhammadi {
+  font-family: 'MuhammadiBold';
+  direction: rtl;
+  text-align: right;
+}
+
+.font-gujarati {
+  font-family: 'Google Sans', 'Rasa',serif;
+}
+
+.font-hindi {
+font-family: 'Tiro Devanagari Hindi', serif;
+}
+
+.font-IndoPak {
+  font-family: 'IndoPak';
+  direction: rtl;
+  text-align: right;
+  } 
+
+.tran-ss {
+  font-family: 'Montserrat', sans-serif;
+  color: hsl(180, 100%, 42%);
+  font-weight: bold;
+}
+
+.preformatted {
+  white-space: pre-line;
+}
+
+/* Sticky Audio Player */
+.sticky-audio-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 40;
+}
+
+/* Dark Mode Styling */
+.dark {
+  @apply bg-gray-800 text-gray-200;
+}
+
+.dark .font-arabic {
+  @apply text-teal-400;
+}
+
+.dark .sajda-word {
+  @apply text-red-500;
+}
+
+.sajda-word {
+  @apply text-red-500;
+}
+
+/* Combine repetitive dark mode styles */
+.dark .surah-header,
+.dark .mb-4.p-4.shadow-md.rounded-3xl {
+  @apply bg-gray-700 text-gray-300;
+}
+
+.dark .text-gray-900 {
+  @apply text-gray-300;
+}
+
+.dark .surah-box {
+  @apply bg-gray-700 text-gray-300 hover:bg-teal-500;
+}
+
+/* Bismillah text */
+.bismillah.text-center {
+  text-align: center !important;
+}
+
+.dark .bismillah.text-center {
+  @apply text-teal-400;
+}
+
+/* Global Font Sizes with CSS Variables */
+:root {
+  --arabic-font-size: 24px;
+  --urdu-font-size: 18px;
+  --english-font-size: 16px;
+  --gujarati-font-size: 16px;
+}
+
+.arabic-text {
+  font-size: var(--arabic-font-size, 24px);
+}
+
+.gujarati-text {
+  font-size: var(--gujarati-font-size, 16px);
+}
+
+.urdu-text {
+  font-size: var(--urdu-font-size, 18px);
+}
+
+.english-text {
+  font-size: var(--english-font-size, 16px);
+}
+
+.hindi-text {
+  font-size: var(--hindi-font-size, 16px);
+}
+/* Transition Effects for Tabs */
+.transition-container {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.transition-container.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.transition-container.fade-out {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* General Button Styling */
+button {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  background-color: #f5f5f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+/* Code Block Styling */
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Header Styling */
+header {
+  @apply bg-gray-800 text-white fixed top-0 w-full z-50 transition-transform duration-300;
+}
+
+.dark header {
+  background-color: rgb(17, 24, 39); /* bg-gray-900 */
+  color: rgb(209, 213, 219); /* text-gray-300 */
+}
+
+/* Tailored Surah Header */
+.surah-header h2 {
+  @apply text-gray-800;
+}
+
+.dark .surah-header h2 {
+  @apply text-gray-100;
+}
+
+/* Button Hover Effects */
+button:hover {
+  @apply opacity-90 transition-opacity duration-300;
+}
+
+
+/* Custom scrollbar for select dropdown */
+select::-webkit-scrollbar {
+  width: 8px;
+}
+
+select::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+select::-webkit-scrollbar-thumb {
+  background: #2CA4AB;
+  border-radius: 4px;
+}
+
+select::-webkit-scrollbar-thumb:hover {
+  background: #1E797F;
+}
+
+.dark select::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.dark select::-webkit-scrollbar-thumb {
+  background: #2CA4AB;
+}
+
+.styled-sup { /* Or any class name you want */
+  @apply text-teal-500 font-bold; /* Use Tailwind utility classes */
+}

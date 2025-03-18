@@ -1,0 +1,53 @@
+I can't directly access or modify your Google Docs. However, I can provide you with the information you need to create the documentation yourself.
+
+Here's a suggested structure for documenting your project files in Google Docs:
+
+**Project: ABQgemini2025**
+
+**File Structure**
+
+```
+abqgemini2025/
+  src/
+    components/
+      Ayah.js
+      AudioPlayer.js
+      Header.js
+      Home.js
+      NavBar.js
+      Settings.js
+      SurahTrPage.js
+      SurahTrPageHeader.js
+      Theme.js
+      Tafsir.js 
+    utils/
+      api.js
+    App.js
+    index.js
+    index.css 
+```
+
+**File Descriptions**
+
+*   **`Ayah.js`:** Renders a single Ayah with its translations and Tafsir.
+*   **`AudioPlayer.js`:**  Handles the audio playback functionality using the browser's default audio player.
+*   **`Header.js`:**  Contains the header of the application, including the navigation bar and settings.
+*   **`Home.js`:**  Displays the list of Surahs on the home page.
+*   **`NavBar.js`:**  Renders the collapsible navigation bar.
+*   **`Settings.js`:**  Contains settings for font size and theme.
+*   **`SurahTrPage.js`:**  Displays the details of a selected Surah, including its Ayahs, translations, and Tafsir.
+*   **`SurahTrPageHeader.js`:** Renders the header section of the Surah details page.
+*   **`Theme.js`:**  Manages the dark/light mode theme toggling.
+*   **`Tafsir.js`:** Renders the Tafsir (explanation) for an Ayah.
+*   **`api.js`:**  Contains helper functions for making API calls.
+*   **`App.js`:**  The main application component that sets up routing and renders other components.
+*   **`index.js`:**  The entry point of the application.
+*   **`index.css`:**  The main CSS file that includes Tailwind directives and custom styles.
+
+**Additional Notes**
+
+*   Database: You have a PostgreSQL database (`qurandb`) that stores the Quran data (Surahs, Ayahs, translations, Tafsirs).
+*   API: You have a Node.js/Express server (`server.js`) that provides API endpoints to access the data from your database.
+*   Tailwind CSS: You're using Tailwind CSS for styling the application.
+
+You can copy this structure and information into your Google Docs to create your project documentation. Remember to update it as you make further changes or add more features to your application.
