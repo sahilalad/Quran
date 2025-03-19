@@ -14,7 +14,7 @@ function Parah() {
     const fetchParahs = async () => {
       try {
         const hostname = window.location.hostname;
-        const apiUrl = `http://${hostname}:3000/api/parahs`;
+        const apiUrl = `http://${hostname}:3001/api/parahs`;
         const response = await fetch(apiUrl);
 
         if (!response.ok) {

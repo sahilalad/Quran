@@ -10,11 +10,11 @@ import axios from 'axios';
 const getBaseUrl = () => {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     // If running on localhost, use the localhost URL
-    return 'http://localhost:3000/api'; 
+    return 'http://localhost:3001/api'; 
   } else {
     // Otherwise, extract the IP address and port from the current URL
     const currentUrl = new URL(window.location.href); 
-    return `http://${currentUrl.hostname}:3000/api`; 
+    return `http://${currentUrl.hostname}:3001/api`; 
   }
 };
 

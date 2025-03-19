@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import NavbarSurahDropdown from "./NavbarSurahDropdown";
 import { FaTimes, FaHome, FaBookmark, FaChartBar, FaHands } from "react-icons/fa"; // React Icons
-
+import { LiaHandsSolid } from "react-icons/lia";
 function NavBar({ isOpen, onClose }) {
   const navRef = useRef(null);
 
@@ -56,6 +56,7 @@ function NavBar({ isOpen, onClose }) {
     { to: "/bookmarks", label: "Bookmarks", icon: <FaBookmark className="w-5 h-5 inline-block mr-2" /> },
     { to: "/progress", label: "Reading Progress", icon: <FaChartBar className="w-5 h-5 inline-block mr-2" /> },
     { to: "/duas", label: "Duas", icon: <FaHands className="w-5 h-5 inline-block mr-2" /> }, // Add the Arabic Reading link
+    { to: "/duacategories", label: "Dua Categories", icon:  <LiaHandsSolid className="w-5 h-5 inline-block mr-2"/> },
   ];
 
   return (

@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-const port = process.env.SERVER_PORT || 3000;
+const port = process.env.SERVER_PORT || 3001;
 
 const pool = new Pool({
     user: process.env.DB_USER,
@@ -386,12 +386,12 @@ app.get("/api/search", async (req, res) => {
 });
 
 // Start the server and listen on the specified port
-/*const newLocal = app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-});*/
-/*const newLocal = app.listen(port, '0.0.0.0', () => {
-    console.log(`Server listening on port ${port}`);
-});*/
+//const newLocal = app.listen(port, () => {
+//    console.log(`Server running on http://localhost:${port}`);
+//});
+//const newLocal = app.listen(port, '0.0.0.0', () => {
+//    console.log(`Server listening on port ${port}`);
+//});
 app.listen(port, '0.0.0.0', () => {
     console.log(`server listening on port ${port}`);
 });
