@@ -72,7 +72,8 @@ body {
   direction: rtl;
   text-align: justify;
   word-spacing: 1px;
-  line-height: 3;
+/*  line-height: 3; */
+  line-height: 2;
 }
 
 .font-madinah {
