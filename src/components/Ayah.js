@@ -109,9 +109,9 @@ function Ayah({ ayah, surahId, nextAyah }) {
             }`}
             id={ayah.ayah_id}
         >
-            <div className="flex justify-between items-center">
-                <div>
-                    <span className="font-bold">Ayah:</span> {ayah.ayah_number}
+            <div className="flex justify-between items-center bg-gray-200 dark:bg-gray-800 border rounded-3xl border-gray-200 dark:border-gray-800 py-2 px-4">
+                <div className="text-black dark:text-white">
+                    <span className="font-bold text-black dark:text-white">Ayah:</span> {ayah.ayah_number}
                 </div>
                 <div className="flex items-center space-x-4">
                 <Share

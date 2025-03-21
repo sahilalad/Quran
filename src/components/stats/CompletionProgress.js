@@ -14,7 +14,7 @@ function CompletionProgress() {
   };
 
   return (
-    <div className="stat-card bg-indigo-50 dark:bg-gray-700 p-4 rounded-xl">
+    <div className="stat-card bg-indigo-50 dark:bg-gray-700 p-2 rounded-xl">
       <div className="text-sm text-gray-600 dark:text-gray-300">Total Progress</div>
       <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
         {calculateCompletion()}%

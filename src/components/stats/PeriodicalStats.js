@@ -27,7 +27,7 @@ function PeriodicalStats() {
   const periodTotal = calculatePeriodStats();
 
   return (
-    <div className="stat-card bg-cyan-50 dark:bg-gray-700 p-4 rounded-xl">
+    <div className="stat-card bg-cyan-50 dark:bg-gray-700 p-2 rounded-xl">
       <div className="flex justify-between items-center mb-2">
         <div className="text-sm text-gray-600 dark:text-gray-300">
           {viewMode === 'week' ? 'This Week' : 'This Month'}
