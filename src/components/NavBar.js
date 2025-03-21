@@ -55,7 +55,7 @@ function NavBar({ isOpen, onClose }) {
     { to: "/", label: "Home", icon: <FaHome className="w-5 h-5 inline-block mr-2" /> },
     { to: "/bookmarks", label: "Bookmarks", icon: <FaBookmark className="w-5 h-5 inline-block mr-2" /> },
     { to: "/progress", label: "Reading Progress", icon: <FaChartBar className="w-5 h-5 inline-block mr-2" /> },
-    { to: "/duas", label: "Duas", icon: <FaHands className="w-5 h-5 inline-block mr-2" /> }, // Add the Arabic Reading link
+    { to: "/duas", label: "All Duas", icon: <FaHands className="w-5 h-5 inline-block mr-2" /> }, // Add the Arabic Reading link
     { to: "/duacategories", label: "Dua Categories", icon:  <LiaHandsSolid className="w-5 h-5 inline-block mr-2"/> },
   ];
 

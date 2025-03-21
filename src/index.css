@@ -29,7 +29,8 @@ body {
 
 @font-face {
   font-family: 'Jameel-Urdu';
-  src: url('./fonts/Jameel-Noori-Nastaleeq-Regular.ttf') format('truetype');
+  src: url('./fonts/NotoNastaliqUrdu-VariableFont_wght.ttf') format('truetype');
+  /* src: url('./fonts/Jameel-Noori-Nastaleeq-Regular.ttf') format('truetype'); */
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -55,6 +56,7 @@ body {
   font-family: "IndoPak";
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
   src: url("./fonts/IndoPak.ttf") format("truetype");
 }
 
@@ -70,7 +72,7 @@ body {
   direction: rtl;
   text-align: justify;
   word-spacing: 1px;
-  line-height: 2;
+  line-height: 3;
 }
 
 .font-madinah {
@@ -99,6 +101,8 @@ font-family: 'Tiro Devanagari Hindi', serif;
   font-family: 'IndoPak';
   direction: rtl;
   text-align: right;
+  word-spacing: 1px;
+  line-height: 2;
   } 
 
 .tran-ss {
@@ -163,7 +167,7 @@ font-family: 'Tiro Devanagari Hindi', serif;
 /* Global Font Sizes with CSS Variables */
 :root {
   --arabic-font-size: 24px;
-  --urdu-font-size: 18px;
+  --urdu-font-size: 14px;
   --english-font-size: 16px;
   --gujarati-font-size: 16px;
 }
@@ -177,7 +181,7 @@ font-family: 'Tiro Devanagari Hindi', serif;
 }
 
 .urdu-text {
-  font-size: var(--urdu-font-size, 18px);
+  font-size: var(--urdu-font-size, 12px);
 }
 
 .english-text {

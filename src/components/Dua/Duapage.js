@@ -13,7 +13,7 @@ const DuaPage = () => {
             <img
               src={categoryItem.image}
               alt={categoryItem.category}
-              className="w-12 h-12 mr-4"
+              className="w-40 h-25 mr-4"
             />
             <h2 className="text-2xl font-semibold dark:text-white">
               {categoryItem.category}

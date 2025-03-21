@@ -6,7 +6,7 @@ function FontSize() {
   const [isExpanded, setIsExpanded] = useState(false); // Default: Collapsed
   const defaultFontSizes = {
     arabic: 24,
-    urdu: 18,
+    urdu: 14,
     english: 16,
     gujarati: 16,
     hindi: 16,
