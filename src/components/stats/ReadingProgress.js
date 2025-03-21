@@ -6,16 +6,26 @@ import CompletionProgress from './CompletionProgress';
 import ReadingTimeStats from './ReadingTimeStats';
 import PeriodicalStats from './PeriodicalStats';
 import ReadingSettings from './ReadingProgressSettings';
+import { useAudioContext } from '../../contexts/AudioContext';
 
 function ReadingProgress() {
   const { readingProgress, resetProgress } = useReadingProgress();
   const { totalRead, streaks, dailyGoal } = readingProgress;
   const [showConfirm, setShowConfirm] = useState(false);
   const resetSectionRef = useRef(null);
+  const { playedAyahs, totalPlaybackTime } = useAudioContext();
 
   const todayRead = Object.values(readingProgress.completedAyahs).filter(
     date => date === new Date().toDateString()
   ).length;
+
+  // Calculate total loops completed
+  const totalLoopsCompleted = Object.values(playedAyahs || {}).reduce(
+    (total, ayah) => total + (ayah.count || 0), 0
+  );
+
+  // Total ayahs completed through audio playback
+  const totalAyahsCompleted = Object.keys(playedAyahs || {}).length;
 
   const handleReset = () => {
     if (showConfirm) {
@@ -32,6 +42,13 @@ function ReadingProgress() {
     }
   }, [showConfirm]);
 
+  // Format the total playback time in hours and minutes
+  const formatPlaybackTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+  };
+
   return (
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Reading Progress</h1>
@@ -45,7 +62,7 @@ function ReadingProgress() {
           </h2>
           <div className="grid grid-cols-2 gap-4">
             {/* Today's Progress */}
-            <div className="stat-card bg-blue-50 dark:bg-gray-700 p-4 rounded-xl">
+            <div className="stat-card bg-blue-50 dark:bg-gray-700 p-2 rounded-xl">
               <div className="text-sm text-gray-600 dark:text-gray-300">Today's Progress</div>
               <div className="flex items-end space-x-2">
                 <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
@@ -64,7 +81,7 @@ function ReadingProgress() {
             </div>
 
             {/* Current Streak */}
-            <div className="stat-card bg-green-50 dark:bg-gray-700 p-4 rounded-xl">
+            <div className="stat-card bg-green-50 dark:bg-gray-700 p-2 rounded-xl">
               <div className="text-sm text-gray-600 dark:text-gray-300">Current Streak</div>
               <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                 {streaks.current} days
@@ -75,13 +92,45 @@ function ReadingProgress() {
             </div>
 
             {/* Total Read */}
-            <div className="stat-card bg-purple-50 dark:bg-gray-700 p-4 rounded-xl">
+            <div className="stat-card bg-purple-50 dark:bg-gray-700 p-2 rounded-xl">
               <div className="text-sm text-gray-600 dark:text-gray-300">Total Read</div>
               <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                 {totalRead} ayahs
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 Total Progress
+              </div>
+            </div>
+
+            {/* Audio Playback Stats - New Section */}
+            <div className="stat-card bg-amber-50 dark:bg-gray-700 p-2 rounded-xl">
+              <div className="text-sm text-gray-600 dark:text-gray-300">Ayahs Listened</div>
+              <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                {totalAyahsCompleted}
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Audio engagement
+              </div>
+            </div>
+
+            <div className="stat-card bg-cyan-50 dark:bg-gray-700 p-2 rounded-xl">
+              <div className="text-sm text-gray-600 dark:text-gray-300">Listening Time</div>
+              <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+                {formatPlaybackTime(totalPlaybackTime || 0)}
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Total audio played
+              </div>
+            </div>
+            
+            {/* New: Loops Completed */}
+            <div className="stat-card bg-pink-50 dark:bg-gray-700 p-2 rounded-xl">
+              <div className="text-sm text-gray-600 dark:text-gray-300">Total Loops</div>
+              <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">
+                {totalLoopsCompleted}
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Repetitions completed
               </div>
             </div>
 

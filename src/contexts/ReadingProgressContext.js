@@ -64,8 +64,17 @@ export function ReadingProgressProvider({ children }) {
     });
   };
 
+  const resetProgress = () => {
+    setReadingProgress(initialState);
+  };
+
   return (
-    <ReadingProgressContext.Provider value={{ readingProgress, updateProgress, setReadingProgress }}>
+    <ReadingProgressContext.Provider value={{ 
+      readingProgress, 
+      updateProgress, 
+      setReadingProgress, 
+      resetProgress
+    }}>
       {children}
     </ReadingProgressContext.Provider>
   );
