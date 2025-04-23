@@ -34,10 +34,11 @@ function Sajda() {
 
   if (isLoading) {
     return (    
-  <div className="flex justify-center items-center"> {/* Parent container */}
-    <FaSpinner className="w-6 h-6 min-h-1px text-center animate-spin text-gray-500 dark:text-gray-400" /> 
-  </div>
-  )}
+      <div className="flex justify-center items-center">
+        <FaSpinner className="w-6 h-6 min-h-1px text-center animate-spin text-gray-500 dark:text-gray-400" /> 
+      </div>
+    );
+  }
 
   if (error) {
     return <p className="text-red-500 text-center">{error}</p>;
@@ -52,37 +53,45 @@ function Sajda() {
         return (
           <div
             key={sajda.id}
-            className="surah-box bg-white text-black rounded-3xl flex items-center p-4 shadow-lg border border-gray-400 
-                      hover:shadow-xl hover:scale-105 hover:bg-teal-400 hover:text-white transition-all duration-300 ease-in-out cursor-pointer"
+            className="surah-box bg-white text-black rounded-3xl flex items-center p-3 shadow-md border border-gray-300 
+                      hover:shadow-lg hover:scale-102 hover:bg-teal-400 hover:text-white transition-all duration-200 ease-in-out cursor-pointer"
             onClick={() => handleSajdaClick(sajda.id)}
           >
             <div className="surah-details flex items-center w-full">
               {/* Sajda Number */}
               <div
-                className="surah-number bg-gradient-to-r from-blue-500 to-teal-500 text-white font-bold text-lg rounded-full 
-                           flex items-center justify-center w-12 h-12 mr-4 shrink-0"
+                className="surah-number bg-gradient-to-r from-blue-500 to-teal-500 text-white font-bold text-base rounded-full 
+                           flex items-center justify-center w-10 h-10 mr-3 shrink-0"
               >
                 {index + 1}
               </div>
 
               {/* Sajda Info */}
               <div className="surah-info flex-grow text-left flex flex-col">
-                {/* Sajda Title */}
-                <h2 className="surah-title text-l font-semibold truncate">
+                {/* Sajda Title
+                <h2 className="surah-title text-lg font-semibold truncate">
                   Sajda {index + 1}
-                </h2>
+                </h2> */}
 
-                {/* First 4 Words of Arabic Text */}
-                <p className="font-arabic text-2xl text-gray-700 mt-2" dir="rtl">
-                  {firstFourWords}
-                </p>
+                {/* Ayah ID and Arabic Text side by side */}
+                <div className="flex justify-between items-center mt-1">
+                  <span className="text-xs">
+                    <strong>Ayah:</strong> {sajda.id}
+                  </span>
+                  <p className="font-arabic text-base text-gray-700 truncate text-right" dir="rtl">
+                    {firstFourWords}
+                  </p>
+                </div>
 
                 {/* Additional Sajda Details */}
-                <div className="surah-info-inner grid grid-cols-2 gap-x-2 gap-y-1 text-sm mt-3">
+                {/* <div className="surah-info-inner grid grid-cols-2 gap-x-1 text-xs mt-1">
                   <span className="surah-start">
-                    <strong>Ayah :</strong> {sajda.id}
+                    <strong>Ayah:</strong> {sajda.id}
                   </span>
-                </div>
+                  <span className="surah-number">
+                    <strong>Surah:</strong> {sajda.id.split(':')[0]}
+                  </span>
+                </div> */}
               </div>
             </div>
           </div>

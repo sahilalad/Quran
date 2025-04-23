@@ -33,9 +33,9 @@ app.use(cors());
 // app.use(express.static(path.join(__dirname, 'project')));
 
 // Route for Surah pages
-app.get('/surah/:surah_id', (req, res) => {
-    res.sendFile(__dirname + '/public/surah.html');
-});
+// app.get('/surah/:surah_id', (req, res) => {
+//     res.sendFile(__dirname + '/public/surah.html');
+// });
 
 app.get('/api/surahs', async (req, res) => {
     try {
@@ -53,7 +53,7 @@ app.get('/api/parahs', async (req, res) => {
     try {
         // No need for a complex SQL query, just return the predefined data
         const parahsData = [
-            { parah_number: 1, ayah_id: '1:1' },
+            { parah_number: 1, ayah_id: '2:1' },
             { parah_number: 2, ayah_id: '2:142' },
             { parah_number: 3, ayah_id: '2:253' },
             { parah_number: 4, ayah_id: '3:92' },
@@ -293,56 +293,50 @@ app.get('/api/surah-rukus', async (req, res) => {
   }
 });
 
-// This endpoint retrieves the text of a specific page from the Quran.
-// The page number is specified as a query parameter.
+// In your server file (e.g., app.js or routes/pages.js)
 app.get('/api/pages', async (req, res) => {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-
-    const pageNumber = req.query.page || 1; // Default to page 1 if no page number is provided
+    const pageNumber = req.query.page || 1; // Default to page 1
   
     try {
       const query = `
-        WITH ruku_mapping AS (
-            SELECT
-                r.ruku_number,
-                r.surah_ruku_number,
-                CAST(jsonb_object_keys(r.verse_mapping) AS INT) AS surah_id, -- Extract surah_id
-                CAST(SPLIT_PART(r.first_verse_key, ':', 2) AS INT) AS first_ayah, -- Extract first ayah
-                CAST(SPLIT_PART(r.last_verse_key, ':', 2) AS INT) AS last_ayah -- Extract last ayah
-            FROM
-                ruku r
+        WITH page_lines AS (
+           SELECT *
+           FROM pages
+           WHERE page_number = $1
         )
-        SELECT 
-            wd.surah AS surah_number,
-            s.name_english AS surah_name,
-            rm.ruku_number AS ruku_number,
-            wd.ayah AS ayah_number,
-            STRING_AGG(wd.text, ' ' ORDER BY wd.word_index) AS ayah_text
-        FROM 
-            pages pg
-        JOIN 
-            words wd ON wd.word_index BETWEEN pg.first_word_id AND pg.last_word_id
-        JOIN 
-            surahs s ON wd.surah = s.surah_id
-        JOIN 
-            ruku_mapping rm 
-            ON wd.surah = rm.surah_id 
-            AND wd.ayah BETWEEN rm.first_ayah AND rm.last_ayah
-        WHERE 
-            pg.page_number = $1
-        GROUP BY 
-            wd.surah, s.name_english, rm.ruku_number, wd.ayah
-        ORDER BY 
-            wd.surah, wd.ayah;
+        SELECT
+           pl.line_number,
+           pl.line_type,
+           pl.is_centered,
+           pl.surah_number,
+           CASE 
+             WHEN pl.line_type = 'ayah' THEN (
+               SELECT STRING_AGG(w.text, ' ' ORDER BY w.word_index)
+               FROM words w
+               WHERE w.word_index BETWEEN pl.first_word_id AND pl.last_word_id
+             )
+             WHEN pl.line_type = 'surah_name' THEN (
+               CASE pl.surah_number
+                 WHEN 1 THEN 'الفاتحة'
+                 WHEN 2 THEN 'البقرة'
+                 -- Add additional mappings as needed
+               END
+             )
+             WHEN pl.line_type = 'basmallah' THEN '﷽'
+           END AS line_text
+        FROM page_lines pl
+        ORDER BY pl.line_number;
       `;
-  
-      const result = await pool.query(query, [pageNumber]); // Pass the page number dynamically
+      const result = await pool.query(query, [pageNumber]);
       res.json(result.rows);
     } catch (error) {
       console.error('Error fetching page details:', error);
       res.status(500).json({ error: 'Database error' });
     }
   });
+  
+
   
 // 🔹 Search API - Searches Ayahs, Translations, and Tafsir
 app.get("/api/search", async (req, res) => {

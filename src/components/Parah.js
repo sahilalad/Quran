@@ -55,20 +55,20 @@ function Parah() {
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       {parahs.map((parah) => {
         // Extract the first 4 words of the first ayah's Arabic text
-        const firstAyahText = parah.arabic_text.split(' ').slice(0, 4).join(' ');
+        const firstAyahText = parah.arabic_text.split(' ').slice(0, 3).join(' ');
 
         return (
           <div
             key={parah.parah_number}
-            className="surah-box bg-white text-black rounded-3xl flex items-center p-4 shadow-lg border border-gray-400 
-                      hover:shadow-xl hover:scale-105 hover:bg-teal-400 hover:text-white transition-all duration-300 ease-in-out cursor-pointer"
+            className="surah-box bg-white text-black rounded-3xl flex items-center p-3 shadow-md border border-gray-300 
+                      hover:shadow-lg hover:scale-102 hover:bg-teal-400 hover:text-white transition-all duration-200 ease-in-out cursor-pointer"
             onClick={() => handleParahClick(parah.ayah_id)}
           >
             <div className="surah-details flex items-center w-full">
               {/* Parah Number */}
               <div
-                className="surah-number bg-gradient-to-r from-blue-500 to-teal-500 text-white font-bold text-lg rounded-full 
-                           flex items-center justify-center w-12 h-12 mr-4 shrink-0"
+                className="surah-number bg-gradient-to-r from-blue-500 to-teal-500 text-white font-bold text-base rounded-full 
+                           flex items-center justify-center w-10 h-10 mr-3 shrink-0"
               >
                 {parah.parah_number}
               </div>
@@ -76,21 +76,26 @@ function Parah() {
               {/* Parah Info */}
               <div className="surah-info flex-grow text-left flex flex-col">
                 {/* Parah Title */}
-                <h2 className="surah-title text-l font-semibold truncate">
+                {/* <h2 className="surah-title text-lg font-semibold truncate">
                   Parah {parah.parah_number}
-                </h2>
+                </h2> */}
 
-                {/* First 4 Words of Arabic Text */}
-                <p className="font-arabic text-2xl text-gray-700 mt-2">
-                  {firstAyahText}
-                </p>
+                {/* Starts at and Arabic Text side by side */}
+                <div className="flex justify-between items-center mt-1">
+                  <span className="text-xs">
+                    <strong>Starts at:</strong> {parah.ayah_id}
+                  </span>
+                  <p className="font-arabic text-lg text-gray-700 truncate text-right" dir="rtl">
+                    {firstAyahText}
+                  </p>
+                </div>
 
                 {/* Additional Parah Details */}
-                <div className="surah-info-inner grid grid-cols-2 gap-x-2 gap-y-1 text-sm mt-3">
+                {/* <div className="surah-info-inner grid grid-cols-2 gap-x-1 text-xs mt-1">
                   <span className="surah-start">
                     <strong>Starts at:</strong> {parah.ayah_id}
                   </span>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

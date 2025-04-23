@@ -1,6 +1,6 @@
 //src/component/SurahTrPage.js
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
 import { axiosGet } from '../utils/api';
 import Ayah from './Ayah';
 import AudioPlayer from './AudioPlayer';
@@ -19,6 +19,7 @@ import { FaChevronDown, FaSpinner } from "react-icons/fa"; // React Icons
 
 function SurahTrPage() {
   const { surahId } = useParams();
+  const location = useLocation();
   const [data, setData] = useState({ surah: null, ayahs: [] });
   const [rukus, setRukus] = useState([]);
   const [selectedRuku, setSelectedRuku] = useState(null);
@@ -66,8 +67,17 @@ const [parahs, setParahs] = useState([]);
   useEffect(() => {
     const fetchParahs = async () => {
       try {
-        const response = await axiosGet('/api/parahs');
-        setParahs(response.parahs);
+        // Check if parahs data is cached
+        const cachedParahs = localStorage.getItem('parahsData');
+        if (cachedParahs) {
+          setParahs(JSON.parse(cachedParahs));
+        } else {
+          const response = await axiosGet('/api/parahs');
+          setParahs(response.parahs);
+
+          // Cache the parahs data
+          localStorage.setItem('parahsData', JSON.stringify(response.parahs));
+        }
       } catch (error) {
         console.error('Error fetching parahs:', error);
       }
@@ -166,31 +176,29 @@ const isAyahIdGreaterOrEqual = (current, boundary) => {
     }
   }, [data.surah, activeTab]);
 
-  // Handle Ruku selection
+  // Handle Ruku selection - updated to jump immediately
   const handleRukuChange = (event) => {
-    setSelectedRuku(event.target.value);
-  };
+    const selectedValue = event.target.value;
+    setSelectedRuku(selectedValue);
+    
+    if (!selectedValue) return;
 
-// Handle Go button click
-const handleGoButtonClick = () => {
-  if (!selectedRuku) return;
+    // Find the first Ayah of the selected Ruku
+    const selectedRukuData = rukus.find(r => r.ruku_number == selectedValue);
+    if (selectedRukuData) {
+      const firstAyahKey = selectedRukuData.start_ayah; // e.g., "1:1"
+      const ayahElement = document.getElementById(`ayah-${firstAyahKey}`);
+      if (ayahElement) {
+        ayahElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Highlight the first Ayah of the selected Ruku
+        setHighlightedAyah(firstAyahKey);
 
-  // Find the first Ayah of the selected Ruku
-  const selectedRukuData = rukus.find(r => r.ruku_number == selectedRuku);
-  if (selectedRukuData) {
-    const firstAyahKey = selectedRukuData.start_ayah; // e.g., "1:1"
-    const ayahElement = document.getElementById(`ayah-${firstAyahKey}`);
-    if (ayahElement) {
-      ayahElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
-      // Highlight the first Ayah of the selected Ruku
-      setHighlightedAyah(firstAyahKey);
-
-      // Remove the highlight after 1 second
-      setTimeout(() => setHighlightedAyah(null), 1000);
+        // Remove the highlight after 1 second
+        setTimeout(() => setHighlightedAyah(null), 1000);
+      }
     }
-  }
-};
+  };
 
   // Ruku separator component
   const RukuSeparator = ({ number, start, end }) => (
@@ -263,14 +271,149 @@ const handleGoButtonClick = () => {
     console.log('Current reading progress:', JSON.parse(savedProgress));
   }, []);
 
+  // Add state for tab switching loading
+  const [isTabSwitching, setIsTabSwitching] = useState(false);
+  
   const handleTabChange = (tab) => {
-    setTabTransition('fade-out');
+    // Determine the direction based on which tab we're switching to
+    const direction = activeTab === 'translation' ? 'slide-left' : 'slide-right';
+    setTabTransition(direction);
+    
+    // Also animate the button
+    setButtonAnimation(direction);
+    
+    // Set tab switching loading state to true
+    setIsTabSwitching(true);
+    
     setTimeout(() => {
-      setActiveTab(tab);
-      localStorage.setItem('activeTab', tab);
-      setTabTransition('fade-in');
-    }, 300);
+      // Toggle between 'translation' and 'arabic'
+      const newTab = activeTab === 'translation' ? 'arabic' : 'translation';
+      setActiveTab(newTab);
+      localStorage.setItem('activeTab', newTab);
+      
+      // Reset the transition after the content has changed
+      setTimeout(() => {
+        setTabTransition('');
+        setButtonAnimation('');
+        // Set tab switching loading state to false after content has loaded
+        setIsTabSwitching(false);
+      }, 50);
+    }, 300); // Wait for the exit animation to complete
   };
+
+  // Add state for button animation
+  const [buttonAnimation, setButtonAnimation] = useState('');
+
+  // Effect for handling scroll and initial state based on hash
+  useEffect(() => {
+    // Function to calculate and set the current info based on a target element or scroll position
+    const calculateCurrentInfo = (targetElementId = null) => {
+      if (!data?.ayahs || !rukus.length) {
+        // Don't calculate if data isn't ready
+        return; 
+      }
+
+      let currentAyahElem = null;
+      
+      // --- Prioritize Hash ---
+      if (targetElementId) {
+        currentAyahElem = document.getElementById(targetElementId);
+      }
+      
+      // --- Fallback to Scroll Position ---
+      if (!currentAyahElem) {
+        // Find the topmost visible Ayah based on scroll position (existing logic)
+        const ayahElements = document.querySelectorAll('[id^="ayah-"]');
+        const viewportTop = 80; // Adjust offset as needed (consider sticky header height)
+
+        for (let i = 0; i < ayahElements.length; i++) {
+          const rect = ayahElements[i].getBoundingClientRect();
+          // Check if the top of the element is at or above the viewportTop threshold
+          if (rect.top >= viewportTop) {
+            currentAyahElem = ayahElements[i];
+            break; // Found the first visible Ayah from the top
+          }
+          // If it's the last element and still above the threshold, use it
+          if (i === ayahElements.length - 1 && rect.top < viewportTop && rect.bottom > viewportTop) {
+             currentAyahElem = ayahElements[i];
+          }
+        }
+         // If no element is found below the threshold (scrolled past the last one), use the last one
+         if (!currentAyahElem && ayahElements.length > 0) {
+            currentAyahElem = ayahElements[ayahElements.length - 1];
+         }
+      }
+
+      // --- Update State based on found element ---
+      if (currentAyahElem) {
+        const ayahId = currentAyahElem.id.split('-')[1];
+        const ayahNumber = data.ayahs.find(a => a.ayah_id === parseInt(ayahId))?.ayah_number;
+        
+        if (ayahNumber) {
+          setCurrentAyah(ayahNumber); // Update Ayah number state
+
+          // Find corresponding Ruku and Parah (existing logic)
+          const currentRuku = rukus.find(ruku => 
+            ayahNumber >= parseInt(ruku.start_ayah.split(':')[1]) && 
+            ayahNumber <= parseInt(ruku.end_ayah.split(':')[1])
+          );
+          setSelectedRuku(currentRuku?.ruku_number || selectedRuku); // Keep previous if not found
+
+          const currentAyahData = data.ayahs.find(a => a.ayah_number === ayahNumber);
+          setShowInfoBar(true); // Keep previous if not found
+        }
+      }
+    };
+
+    // --- Initial Calculation ---
+    // Check if data is loaded before attempting initial calculation
+    if (data?.ayahs && rukus.length > 0) {
+        // Extract target Ayah ID from URL hash if present
+        const targetAyahId = location.hash.startsWith('#ayah-') ? location.hash.substring(1) : null;
+        
+        // Use a small delay to allow the browser to scroll to the hash first
+        const timer = setTimeout(() => {
+            calculateCurrentInfo(targetAyahId); 
+        }, 150); // Adjust delay if needed
+
+        // Cleanup timer if component unmounts or dependencies change before timeout
+        // return () => clearTimeout(timer); // See note below
+    }
+
+
+    // --- Scroll Event Listener ---
+    const handleScroll = () => {
+      // Use the same calculation logic, but without prioritizing hash (rely on scroll pos)
+      calculateCurrentInfo(); 
+    };
+
+    // Debounce handleScroll for performance
+    const debouncedScrollHandler = debounce(handleScroll, 50); // Adjust debounce delay (e.g., 50ms)
+
+    window.addEventListener('scroll', debouncedScrollHandler);
+
+    // Cleanup function
+    return () => {
+      // clearTimeout(timer); // Clear timeout if effect re-runs before it fires
+      window.removeEventListener('scroll', debouncedScrollHandler);
+    };
+
+  // Dependencies: Recalculate when data, rukus, location hash, or surahId changes
+  }, [data, rukus, location.hash, surahId, selectedRuku]); // Added current numbers to deps to avoid stale closures in calculation
+
+
+  // Simple debounce function (or use lodash/underscore)
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
 
   if (isLoading) {
     return ( 
@@ -304,81 +447,134 @@ const currentParahNumber = currentAyahObj ? currentAyahObj.parah_number : '';
 
   return (
     <div className="container mx-auto p-4 mt-0 sm:max-w-full" style={{ maxWidth: '800px' }}>
-          {activeTab === 'translation' && showInfoBar && (
-      <SurahInfoBar     surah={data.surah} 
-    currentAyahNumber={currentAyahNumber} 
-    currentRukuNumber={currentRukuNumber}
-    parahNumber={currentParahNumber} />
-    )}
-      {/* Tabs and Navigate button */}
-      <div className="flex items-center justify-between mb-4 text-sm">
-        <div className="flex space-x-1">
-          {tabs.map(tab => (
-            <button
-              key={tab}
-              onClick={() => handleTabChange(tab)}
-              className={`px-4 py-2 rounded-3xl ${
-                activeTab === tab 
-                  ? 'bg-teal-500 text-white' 
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
-        </div>
+      {/* Add CSS for slide transitions */}
+      <style jsx>{`
+        .slide-left {
+          animation: slideLeft 0.2s forwards;
+        }
+        .slide-right {
+          animation: slideRight 0.2s forwards;
+        }
+        @keyframes slideLeft {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(-10%); opacity: 0; }
+        }
+        @keyframes slideRight {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(10%); opacity: 0; }
+        }
+        .tab-content {
+          position: relative;
+          overflow: hidden;
+        }
+        
+        /* Button animations */
+        .button-slide-left {
+          animation: buttonSlideLeft 0.3s forwards;
+        }
+        .button-slide-right {
+          animation: buttonSlideRight 0.3s forwards;
+        }
+        @keyframes buttonSlideLeft {
+          0% { transform: translateX(0); }
+          50% { transform: translateX(-5px); }
+          100% { transform: translateX(0); }
+        }
+        @keyframes buttonSlideRight {
+          0% { transform: translateX(0); }
+          50% { transform: translateX(5px); }
+          100% { transform: translateX(0); }
+        }
+      `}</style>
+      
+      {activeTab === 'translation' && showInfoBar && (
+        <SurahInfoBar     
+          surah={data.surah} 
+          currentAyahNumber={currentAyahNumber} 
+          currentRukuNumber={currentRukuNumber}
+          parahNumber={currentParahNumber} 
+        />
+      )}
+      
+      {/* Container for top controls - Updated for single row layout and DirectJump styling */}
+      <div className="flex flex-row items-center justify-between mb-4 gap-2 text-sm">
+        {/* Toggle Tab Button - Styled like DirectJump button */}
         <button
-          onClick={() => setIsNavigateOpen(!isNavigateOpen)}
-          className={`flex items-center gap-1 px-4 py-2 rounded-3xl ${
-            isNavigateOpen 
-              ? 'bg-teal-500 text-white' 
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+          onClick={handleTabChange}
+          // Apply DirectJump button styles: rounded, padding, bg, text, hover, transition
+          className={`flex-1 px-3 py-2 rounded-3xl bg-teal-600 text-white hover:bg-teal-700 transition-colors text-center ${
+            buttonAnimation === 'slide-left' ? 'button-slide-left' : 
+            buttonAnimation === 'slide-right' ? 'button-slide-right' : ''
           }`}
         >
-        <FaChevronDown className={`h-5 w-5 transition-transform ${isNavigateOpen ? 'rotate-180' : ''}`} />
-          <span>{isNavigateOpen ? 'Go to Ayah' : 'Go to Ayah'}</span>
+          {activeTab === 'translation' ? 'Arabic' : 'Translate'} {/* Shortened text */}
         </button>
-      </div>
 
-      {/* Navigation Panel */}
+        {/* Go to Ayah Button - Styled like DirectJump button/select */}
+        <button
+          onClick={() => setIsNavigateOpen(!isNavigateOpen)}
+          // Apply DirectJump styles: rounded, padding, border. Conditional bg/text for active state.
+          className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-3xl border transition-colors ${
+            isNavigateOpen 
+              ? 'bg-teal-600 text-white border-teal-600' // Active state like Jump button
+              : 'bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600' // Inactive state like selects
+          }`}
+        >
+          <FaChevronDown className={`h-4 w-4 transition-transform ${isNavigateOpen ? 'rotate-180' : ''}`} />
+          <span>Go To</span> {/* Shortened text */}
+        </button>
+
+        {/* Ruku Dropdown - Styled exactly like the "Go To Ayah" button (inactive state) */}
+        <div className="relative flex-1"> {/* Wrapper remains for positioning */}
+          {/* Apply button styles to the container div */}
+          <div className={`flex items-center justify-center gap-1 px-3 py-2 rounded-3xl border transition-colors bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer`}>
+            {/* Icon */}
+            <FaChevronDown className="h-4 w-4" />
+            {/* Select element - made transparent and overlaid */}
+            <select
+              id="ruku-select"
+              onChange={handleRukuChange}
+              value={selectedRuku || ""}
+              // Make select transparent, cover the container, keep functionality
+              className="absolute inset-0 w-full h-full opacity-0 dark:bg-gray-700 cursor-pointer"
+            >
+              <option value="" disabled>Select Ruku</option> {/* Hidden, but needed for value */}
+              {rukus.map(ruku => (
+                <option key={ruku.ruku_number} value={ruku.ruku_number}>
+                  {/* Display text is now handled by the container, but options needed */}
+                  Ruku {ruku.ruku_number} ({ruku.start_ayah.split(':')[1]}-{ruku.end_ayah.split(':')[1]})
+                </option>
+              ))}
+            </select>
+            {/* Display Text - shows "Ruku" or selected Ruku */}
+            <span className="flex-1 text-center">
+              {selectedRuku 
+                ? `Ruku ${selectedRuku}` 
+                : 'Ruku'}
+            </span>
+          </div>
+        </div>
+      </div>
+          
+      {/* Navigation Panel (Direct Jump) - Appears below the buttons */}
       {isNavigateOpen && (
-        <div className="mb-6">
-          <DirectJump isCollapsed={!isNavigateOpen} setIsCollapsed={setIsNavigateOpen} />
+        <div className="mb-4"> {/* Adjusted margin */}
+          <DirectJump 
+            isCollapsed={!isNavigateOpen}
+            setIsCollapsed={setIsNavigateOpen}
+          />
         </div>
       )}
 
-      {/* Ruku Dropdown and Go Button */}
-      <div className="mb-4 flex items-center gap-2">
-        <div className="flex-1">
-          <label htmlFor="ruku-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Select Ruku:
-          </label>
-          <select
-            id="ruku-select"
-            onChange={handleRukuChange}
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 bg-gray-200 dark:bg-gray-700 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm rounded-3xl"
-          >
-            <option value="">Choose a Ruku</option>
-            {rukus.map(ruku => (
-              <option key={ruku.ruku_number} value={ruku.ruku_number}>
-                Ruku {ruku.ruku_number} (Ayah {ruku.start_ayah.split(':')[1]}-{ruku.end_ayah.split(':')[1]})
-              </option>
-            ))}
-          </select>
-        </div>
-        <button
-          onClick={handleGoButtonClick}
-          className="mt-6 px-4 py-2 bg-teal-500 text-white rounded-3xl hover:bg-teal-600"
-        >
-          Go
-        </button>
-      </div>
-
-      {/* Tab Content */}
-      <div className={`transition-opacity duration-300 ${tabTransition}`}>
-        {activeTab === 'translation' ? (
+      {/* Tab Content with slide transition and loading spinner */}
+      <div className={`tab-content ${tabTransition}`}>
+        {isTabSwitching ? (
+          <div className="flex justify-center items-center py-20">
+            <FaSpinner className="w-8 h-8 animate-spin text-teal-500" />
+          </div>
+        ) : activeTab === 'translation' ? (
           <>
-            <NextPrev />
+            {/* <NextPrev /> */}
             <SurahTrPageHeader surah={data.surah} />
             <div className="mb-20">
               {data.ayahs.map((ayah, index) => {
@@ -411,13 +607,16 @@ const currentParahNumber = currentAyahObj ? currentAyahObj.parah_number : '';
                   </React.Fragment>
                 );
               })}
-              <NextPrev />
+              {/* <NextPrev /> */}
             </div>
           </>
         ) : (
           <ArabicReading 
             selectedRuku={selectedRuku}
             rukus={rukus}
+            preloadedContent={data}
+            isPreloading={isLoading}
+            surahId={surahId}
           />
         )}
       </div>
@@ -431,15 +630,15 @@ const currentParahNumber = currentAyahObj ? currentAyahObj.parah_number : '';
       {!isAudioPlayerDisabled && (
         <AudioPlayer key={`audio-player-${data.surah.surah_id}`} surahId={data.surah.surah_id} />
       )}
-          {/* Add StickyNav below everything else */}
-    <StickyNav
-      activeTab={activeTab}
-      handleTabChange={handleTabChange}
-      isNavigateOpen={isNavigateOpen}
-      setIsNavigateOpen={setIsNavigateOpen}
-      enabled={isStickyNavEnabled} // or true if you don't want to offer disabling
-      rukus={rukus}  // Pass your ruku array from state
-    />
+      {/* Add StickyNav below everything else */}
+      <StickyNav
+        activeTab={activeTab}
+        handleTabChange={handleTabChange}
+        isNavigateOpen={isNavigateOpen}
+        setIsNavigateOpen={setIsNavigateOpen}
+        enabled={isStickyNavEnabled}
+        rukus={rukus}
+      />
     </div>
   );
 }

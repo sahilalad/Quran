@@ -11,7 +11,8 @@ import AyahAudio from "./AyahAudio";
 import { FaChevronCircleDown } from "react-icons/fa"; // React Icons
 import { BsBookmarkCheckFill, BsBookmark } from "react-icons/bs";
 
-function Ayah({ ayah, surahId, nextAyah }) {
+// Wrap the original function component with React.memo
+const Ayah = React.memo(({ ayah, surahId, nextAyah }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const { ayah_id, ayah_number, arabic_text, ayah_key } = ayah; // Ensure ayah_key is destructured
@@ -25,18 +26,18 @@ function Ayah({ ayah, surahId, nextAyah }) {
     const [isActive, setIsActive] = useState(false);
     
     useEffect(() => {
-        setIsActive(currentlyPlayingAyah?.ayahKey === ayah.ayah_id);
-    }, [currentlyPlayingAyah, ayah.ayah_id]);
+        setIsActive(currentlyPlayingAyah?.ayahKey === ayah_id);
+    }, [currentlyPlayingAyah, ayah_id]);
 
     // Handle URL hash for auto-scrolling
     useEffect(() => {
         const hash = location.hash; // Get the hash from the URL (e.g., #ayah-1)
         if (hash && hash.startsWith("#ayah-")) {
-            const ayahId = hash.replace("#ayah-", "");
+            const ayahIdFromHash = hash.replace("#ayah-", "");
 
             // Scroll to the Ayah
-            const ayahElement = document.getElementById(`ayah-${ayahId}`);
-            if (ayahElement) {
+            const ayahElement = document.getElementById(`ayah-${ayah_id}`);
+            if (ayahElement && ayah_id === parseInt(ayahIdFromHash, 10)) {
                 ayahElement.scrollIntoView({
                     behavior: "smooth",
                     block: "center",
@@ -48,7 +49,7 @@ function Ayah({ ayah, surahId, nextAyah }) {
                 }, 1000); // Wait for the scroll to complete
             }
         }
-    }, [location.hash, location.pathname, navigate]);
+    }, [location.hash, location.pathname, navigate, ayah_id]);
 
     // Handle bookmark state
     useEffect(() => {
@@ -57,8 +58,8 @@ function Ayah({ ayah, surahId, nextAyah }) {
                 surahs: {},
                 ayahs: {},
             };
-        setIsBookmarked(storedBookmarks.ayahs[ayah.ayah_id]!== undefined);
-    }, [ayah]);
+        setIsBookmarked(storedBookmarks.ayahs[ayah_id] !== undefined);
+    }, [ayah_id]);
 
     // Toggle Tafsir section
     const toggleTafsir = () => {
@@ -72,21 +73,21 @@ function Ayah({ ayah, surahId, nextAyah }) {
                 surahs: {},
                 ayahs: {},
             };
-        const ayahKey = ayah.ayah_id;
+        const currentAyahKey = ayah_id;
 
         if (isBookmarked) {
-            delete bookmarks.ayahs[ayahKey];
-            toast.info(`Removed bookmark for Ayah ${ayah.ayah_id}`, {
+            delete bookmarks.ayahs[currentAyahKey];
+            toast.info(`Removed bookmark for Ayah ${ayah_id}`, {
                 position: "top-right",
                 autoClose: 2000,
             });
         } else {
-            bookmarks.ayahs[ayahKey] = {
-                surahId: ayah.surah_id,
-                ayahNumber: ayah.ayah_number,
+            bookmarks.ayahs[currentAyahKey] = {
+                surahId: surahId,
+                ayahNumber: ayah_number,
                 timestamp: Date.now(),
             };
-            toast.success(`Bookmarked Ayah ${ayah.ayah_id} successfully!`, {
+            toast.success(`Bookmarked Ayah ${ayah_id} successfully!`, {
                 position: "top-right",
                 autoClose: 2000,
             });
@@ -107,11 +108,11 @@ function Ayah({ ayah, surahId, nextAyah }) {
             className={`mb-4 p-4 rounded-3xl shadow-md transition-colors duration-0 ${
                 isActive ? "bg-blue-100 dark:bg-blue-900" : "bg-white dark:bg-gray-800"
             }`}
-            id={ayah.ayah_id}
+            id={`ayah-${ayah_id}`}
         >
             <div className="flex justify-between items-center bg-gray-200 dark:bg-gray-800 border rounded-3xl border-gray-200 dark:border-gray-800 py-2 px-4">
                 <div className="text-black dark:text-white">
-                    <span className="font-bold text-black dark:text-white">Ayah:</span> {ayah.ayah_number}
+                    <span className="font-bold text-black dark:text-white">Ayah:</span> {ayah_number}
                 </div>
                 <div className="flex items-center space-x-4">
                 <Share
@@ -135,7 +136,6 @@ function Ayah({ ayah, surahId, nextAyah }) {
                 />
 
                     <AyahAudio ayahKey={ayah_id} nextAyahKey={nextAyah ? nextAyah.ayah_id : null} />
-                    {/* Pass ayah_key to AyahAudio */}
                     <button
                         className="ayah-bookmark-icon text-black dark:text-white transition-all duration-0"
                         onClick={handleBookmarkToggle}
@@ -152,11 +152,11 @@ function Ayah({ ayah, surahId, nextAyah }) {
             <p
                 className={`arabic-text font-arabic text-3xl text-right mt-4 mb-2 transition-all duration-0 ${
                     isActive ? "text-blue-500 dark:text-yellow-300 scale-105" : ""
-                }`}
+                } ${ayah.sajda_word === "yes" ? "text-red-500 dark:text-red-400" : ""}`}
                 dir="rtl"
                 style={{ lineHeight: "1.5em" }}
             >
-                {ayah.arabic_text}
+                {arabic_text}
             </p>
 
             <hr className="my-4" />
@@ -168,7 +168,6 @@ function Ayah({ ayah, surahId, nextAyah }) {
                     <p className="gujarati-text font-gujarati text-gray-900 text-1xl">
                         <b>ભાષાન્તર:</b> {ayah.translation_gujarati}
                     </p>
-                    <p className="text-xs text-left text-gray-600 dark:text-gray-400"> - Ahsan-ul-Bayan | Abdul Qadir Nadisarwala</p>
                 </div> 
                 )}
 
@@ -178,7 +177,6 @@ function Ayah({ ayah, surahId, nextAyah }) {
                   <p className="english-text text-gray-900 text-1xl">
                       <b>Tarjuma:</b> {ayah.translation_as_kalam_roman}
                   </p>
-                  <p className="text-xs text-left text-gray-600 dark:text-gray-400"> - Ahsanul Kalaam </p>
                   </div>
                 )}
 
@@ -188,7 +186,6 @@ function Ayah({ ayah, surahId, nextAyah }) {
                   <p className="english-text text-gray-900 text-1xl">
                       <b>Translation:</b> {ayah.translation_english}
                   </p>
-                  <p className="text-xs text-left text-gray-600 dark:text-gray-400"> - Hilali & Mohsin Khan</p>
                   </div>
                 )}
 
@@ -205,7 +202,6 @@ function Ayah({ ayah, surahId, nextAyah }) {
                         }}
                     />
                 </div>
-                <p className="text-xs text-right text-gray-600 dark:text-gray-400"> - Ahsan-ul-Bayan | Muhammad Junagarhi</p>
               </div>  
             )}
 
@@ -222,7 +218,6 @@ function Ayah({ ayah, surahId, nextAyah }) {
                         }}
                     />
                 </div>
-                <p className="text-xs text-left text-gray-600 dark:text-gray-400"> - Maulana Azizul Haque al-Umari</p>
               </div>  
             )}
 
@@ -249,6 +244,9 @@ function Ayah({ ayah, surahId, nextAyah }) {
             )}
         </div>
     );
-}
+});
+
+// Add display name for better debugging
+Ayah.displayName = 'Ayah';
 
 export default Ayah;

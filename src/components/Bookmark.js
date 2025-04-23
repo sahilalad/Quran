@@ -6,13 +6,13 @@ import { FaTrashAlt } from "react-icons/fa"; // React Icons for delete
 import 'react-toastify/dist/ReactToastify.css';
 
 function Bookmark() {
-  const [bookmarks, setBookmarks] = useState({ surahs: {}, ayahs: {} });
+  const [bookmarks, setBookmarks] = useState({ surahs: {}, ayahs: {}, pages: {} });
   const [confirmBeforeRemove, setConfirmBeforeRemove] = useState(true); // State to toggle confirmation
   const [sortOption, setSortOption] = useState('dateNewest'); // Default sorting option
 
   // Load bookmarks and preferences from localStorage
   useEffect(() => {
-    const storedBookmarks = JSON.parse(localStorage.getItem('bookmarks')) || { surahs: {}, ayahs: {} };
+    const storedBookmarks = JSON.parse(localStorage.getItem('bookmarks')) || { surahs: {}, ayahs: {}, pages: {} };
     setBookmarks(storedBookmarks);
 
     // Load the confirmation preference from localStorage (default to true)
@@ -34,6 +34,12 @@ function Bookmark() {
         position: 'top-right',
         autoClose: 2000,
       });
+    } else if (type === 'page') {
+      delete updatedBookmarks.pages[id];
+      toast.info('Page bookmark removed successfully!', {
+        position: 'top-right',
+        autoClose: 2000,
+      });
     }
 
     setBookmarks(updatedBookmarks);
@@ -44,7 +50,7 @@ function Bookmark() {
   const clearAllBookmarks = () => {
     if (window.confirm('Are you sure you want to clear all bookmarks?')) {
       localStorage.removeItem('bookmarks');
-      setBookmarks({ surahs: {}, ayahs: {} });
+      setBookmarks({ surahs: {}, ayahs: {}, pages: {} });
       toast.warn('All bookmarks cleared!', {
         position: 'top-right',
         autoClose: 2000,
@@ -54,9 +60,12 @@ function Bookmark() {
 
   // Sort bookmarks based on the selected option
   const getSortedBookmarks = (bookmarks) => {
-    const sortedAyahs = Object.entries(bookmarks.ayahs).sort((a, b) => {
-      const [aSurahId] = a[0].split(':');
-      const [bSurahId] = b[0].split(':');
+    // Sort ayahs
+    const sortedAyahs = Object.entries(bookmarks.ayahs || {}).sort((a, b) => {
+      const [aSurahAyah] = a[0].split(':');
+      const [bSurahAyah] = b[0].split(':');
+      const aSurahId = parseInt(aSurahAyah.split(':')[0], 10);
+      const bSurahId = parseInt(bSurahAyah.split(':')[0], 10);
       const aTimestamp = a[1].timestamp;
       const bTimestamp = b[1].timestamp;
 
@@ -65,15 +74,45 @@ function Bookmark() {
       } else if (sortOption === 'dateOldest') {
         return aTimestamp - bTimestamp; // Oldest first
       } else if (sortOption === 'surahAsc') {
-        return parseInt(aSurahId, 10) - parseInt(bSurahId, 10); // Surah number ascending
+        return aSurahId - bSurahId; // Surah ascending
       } else if (sortOption === 'surahDesc') {
-        return parseInt(bSurahId, 10) - parseInt(aSurahId, 10); // Surah number descending
+        return bSurahId - aSurahId; // Surah descending
       }
 
       return 0; // Default no sorting
     });
 
-    return { ...bookmarks, ayahs: Object.fromEntries(sortedAyahs) };
+    // Sort pages
+    const sortedPages = Object.entries(bookmarks.pages || {}).sort((a, b) => {
+      const aPageNum = parseInt(a[0], 10);
+      const bPageNum = parseInt(b[0], 10);
+      const aTimestamp = a[1].timestamp;
+      const bTimestamp = b[1].timestamp;
+      const aSurahNum = a[1].surahNumber ? parseInt(a[1].surahNumber, 10) : 0;
+      const bSurahNum = b[1].surahNumber ? parseInt(b[1].surahNumber, 10) : 0;
+
+      if (sortOption === 'dateNewest') {
+        return bTimestamp - aTimestamp; // Newest first
+      } else if (sortOption === 'dateOldest') {
+        return aTimestamp - bTimestamp; // Oldest first
+      } else if (sortOption === 'surahAsc') {
+        return aSurahNum - bSurahNum || aPageNum - bPageNum; // Surah ascending, then page
+      } else if (sortOption === 'surahDesc') {
+        return bSurahNum - aSurahNum || aPageNum - bPageNum; // Surah descending, then page
+      } else if (sortOption === 'pageAsc') {
+        return aPageNum - bPageNum; // Page ascending
+      } else if (sortOption === 'pageDesc') {
+        return bPageNum - aPageNum; // Page descending
+      }
+
+      return 0; // Default no sorting
+    });
+
+    return {
+      ...bookmarks,
+      ayahs: Object.fromEntries(sortedAyahs),
+      pages: Object.fromEntries(sortedPages)
+    };
   };
 
   const sortedBookmarks = getSortedBookmarks(bookmarks);
@@ -127,7 +166,50 @@ function Bookmark() {
           <option value="dateOldest">Date Added (Oldest)</option>
           <option value="surahAsc">Surah (Ascending)</option>
           <option value="surahDesc">Surah (Descending)</option>
+          <option value="pageAsc">Page (Ascending)</option>
+          <option value="pageDesc">Page (Descending)</option>
         </select>
+      </div>
+
+      {/* Page Bookmarks Section */}
+      <div className="pages-bookmarks mb-8">
+        <h2 className="text-lg font-bold mb-4">Page Bookmarks</h2>
+        <ul>
+          {Object.entries(sortedBookmarks.pages || {}).map(([pageNumber, pageData]) => {
+            const formattedDate = new Date(pageData.timestamp).toLocaleString();
+
+            return (
+              <li key={`page-${pageNumber}`} className="flex justify-between items-center mb-2">
+                <div>
+                  <Link
+                    to={`/13linepage`}
+                    state={{ pageNumber: parseInt(pageNumber, 10) }}
+                    className="text-blue-600 dark:text-teal-400 hover:underline"
+                  >
+                    Page {pageNumber}
+                    {pageData.surahNumber && `, Surah ${pageData.surahNumber}`}
+                    {pageData.parahNumber && `, Parah ${pageData.parahNumber}`}
+                  </Link>
+                  {pageData.note && (
+                    <p className="text-sm italic text-gray-600 dark:text-gray-400">
+                      Note: {pageData.note}
+                    </p>
+                  )}
+                  <p className="text-sm text-gray-500 dark:text-gray-300">Added: {formattedDate}</p>
+                </div>
+                <button
+                  onClick={() => removeBookmark('page', pageNumber)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <FaTrashAlt className="w-6 h-6" />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        {Object.keys(sortedBookmarks.pages || {}).length === 0 && (
+          <p className="text-gray-500 text-center">No page bookmarks found.</p>
+        )}
       </div>
 
       {/* Ayahs Bookmarks Section */}
@@ -163,12 +245,15 @@ function Bookmark() {
 
       {/* No bookmarks message */}
       {Object.keys(bookmarks.surahs).length === 0 &&
-        Object.keys(bookmarks.ayahs).length === 0 && (
+        Object.keys(bookmarks.ayahs).length === 0 &&
+        Object.keys(bookmarks.pages).length === 0 && (
           <p className="text-gray-500 text-center mt-8">No bookmarks found.</p>
         )}
 
       {/* Clear All Bookmarks Button */}
-      {Object.keys(bookmarks.surahs).length > 0 || Object.keys(bookmarks.ayahs).length > 0 ? (
+      {Object.keys(bookmarks.surahs).length > 0 ||
+        Object.keys(bookmarks.ayahs).length > 0 ||
+        Object.keys(bookmarks.pages).length > 0 ? (
         <button
           onClick={clearAllBookmarks}
           className="bg-red-500 hover:bg-red-700 text-black font-bold w-full py-2 px-4 rounded-3xl mt-10"

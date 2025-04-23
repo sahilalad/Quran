@@ -60,7 +60,23 @@ body {
   src: url("./fonts/IndoPak.ttf") format("truetype");
 }
 
+@font-face {
+  font-family: "SurahNames";
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  src: url("./fonts/surah_names.woff2") format("woff2");
+}
 /* Classes for custom fonts */
+.font-SurahNames {
+  font-family: 'SurahNames';
+}
+
+.font-13line {
+  font-family: 'AlQuran-IndoPak';
+  direction: rtl;
+}
+
 .font-arabic {
   font-family: 'AlQuran-IndoPak','Open Sans', Arial, sans-serif;
   direction: rtl;
@@ -72,7 +88,6 @@ body {
   direction: rtl;
   text-align: justify;
   word-spacing: 1px;
-/*  line-height: 3; */
   line-height: 2;
 }
 

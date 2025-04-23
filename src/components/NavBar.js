@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import NavbarSurahDropdown from "./NavbarSurahDropdown";
-import { FaTimes, FaHome, FaBookmark, FaChartBar, FaHands } from "react-icons/fa"; // React Icons
+import { FaTimes, FaHome, FaBookmark, FaChartBar, FaHands, FaQuran, } from "react-icons/fa"; // React Icons
 import { LiaHandsSolid } from "react-icons/lia";
 function NavBar({ isOpen, onClose }) {
   const navRef = useRef(null);
@@ -57,6 +57,8 @@ function NavBar({ isOpen, onClose }) {
     { to: "/progress", label: "Reading Progress", icon: <FaChartBar className="w-5 h-5 inline-block mr-2" /> },
     { to: "/duas", label: "All Duas", icon: <FaHands className="w-5 h-5 inline-block mr-2" /> }, // Add the Arabic Reading link
     { to: "/duacategories", label: "Dua Categories", icon:  <LiaHandsSolid className="w-5 h-5 inline-block mr-2"/> },
+    { to: "/13linepage", label: "13 Line", icon:  <FaQuran className="w-5 h-5 inline-block mr-2"/> },
+    // { to: "/quranpages.html", label: "15 Line test", icon:  <FaQuran className="w-5 h-5 inline-block mr-2"/> },
   ];
 
   return (
@@ -73,7 +75,7 @@ function NavBar({ isOpen, onClose }) {
         <button
           onClick={onClose}
           aria-label="Close Navigation"
-          className="text-white focus:outline-none hover:text-teal-400 transition-colors duration-200"
+          className="text-white focus:outline-none hover:text-teal-400 transition-colors duration-100"
         >
           <FaTimes className="w-6 h-6" />
         </button>

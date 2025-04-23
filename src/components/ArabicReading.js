@@ -7,6 +7,7 @@ import AudioPlayer from './AudioPlayer';
 import { useAudioContext } from '../contexts/AudioContext';
 import Bismillah from '../icon/Bismillahnew';
 import LoadingSpinner from './loading';
+import { FaSpinner } from 'react-icons/fa';
 
 // Inline BismillahComponent definition
 const BismillahComponent = () => (
@@ -19,20 +20,22 @@ const BismillahComponent = () => (
   </div>
 );
 
-function ArabicReading({ selectedRuku, rukus }) {
-  const { surahId } = useParams();
+function ArabicReading({ selectedRuku, rukus, preloadedContent, isPreloading, surahId }) {
+  const { surahId: urlSurahId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [surahData, setSurahData] = useState({ surah: null, ayahs: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [highlightedAyah, setHighlightedAyah] = useState(null);
   const { isAudioPlayerDisabled } = useAudioContext();
+  const [arabicContent, setArabicContent] = useState(null);
+  const [error, setError] = useState(null);
 
   // Fetch surah data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const surahResponse = await axiosGet(`/surah/${surahId}`);
+        const surahResponse = await axiosGet(`/surah/${urlSurahId}`);
         setSurahData({ surah: surahResponse.surah, ayahs: surahResponse.ayahs });
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -41,7 +44,7 @@ function ArabicReading({ selectedRuku, rukus }) {
       }
     };
     fetchData();
-  }, [surahId]);
+  }, [urlSurahId]);
 
   // Handle Ruku selection
   useEffect(() => {
@@ -90,6 +93,58 @@ function ArabicReading({ selectedRuku, rukus }) {
     return () => window.removeEventListener('hashchange', handleHashNavigation);
   }, [location, navigate, isLoading]);
 
+  useEffect(() => {
+    // If preloaded content is available, use it
+    if (preloadedContent) {
+      console.log("Using preloaded content:", preloadedContent);
+      setSurahData({ 
+        surah: preloadedContent.surah, 
+        ayahs: preloadedContent.ayahs 
+      });
+      setArabicContent(preloadedContent);
+      setIsLoading(false);
+      return;
+    }
+
+    // Otherwise, fetch the content
+    const fetchArabicContent = async () => {
+      if (!surahId) return;
+      
+      try {
+        setIsLoading(true);
+        // Use the same endpoint as in SurahTrPage
+        const response = await axiosGet(`/surah/${surahId}`);
+        setSurahData({ 
+          surah: response.surah, 
+          ayahs: response.ayahs 
+        });
+        setArabicContent(response);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching Arabic content:', err);
+        setError('Failed to load Arabic content. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchArabicContent();
+  }, [preloadedContent, surahId]);
+
+  // Filter content by selected Ruku if needed
+  const filteredContent = React.useMemo(() => {
+    if (!arabicContent || !selectedRuku || !rukus.length) return arabicContent;
+    
+    const selectedRukuObj = rukus.find(r => r.ruku_number === selectedRuku);
+    if (!selectedRukuObj) return arabicContent;
+    
+    // Filter content based on ruku start and end ayahs
+    // This depends on your data structure
+    // ...
+
+    return arabicContent;
+  }, [arabicContent, selectedRuku, rukus]);
+
   // Ruku separator component
   const RukuSeparator = ({ number, start, end }) => (
     <div className="relative py-6">
@@ -135,21 +190,36 @@ function ArabicReading({ selectedRuku, rukus }) {
     });
   };
 
-  if (isLoading) return <div className="dark:bg-gray-900 bg-white min-h-1px"> <LoadingSpinner /></div>;
-  if (!surahData.surah || !surahData.ayahs) return <div>Error loading data</div>;
+  if (isLoading || isPreloading) {
+    return (
+      <div className="flex justify-center items-center py-10">
+        <FaSpinner className="w-6 h-6 min-h-1px text-center animate-spin text-gray-500 dark:text-gray-400" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-red-500 text-center py-10">{error}</div>;
+  }
+
+  if (!arabicContent) {
+    return <div className="text-center py-10">No Arabic content available</div>;
+  }
 
   const groupedRukus = getGroupedRukus();
 
   return (
     <div className="container mx-auto p-4 sm:max-w-full max-w-[800px]">
-      <NextPrev />
+    <div className="mb-20">
+
+      {/* <NextPrev /> */}
       <div className="surah-header mb-5 p-2 bg-white rounded-3xl gap-4 flex flex-wrap justify-center items-center shadow-md">
         <h2 className="text-2xl font-bold text-black">
           {surahData.surah.surah_number} - {surahData.surah.name_english}
         </h2>
       </div>
 
-      {parseInt(surahId) !== 1 && parseInt(surahId) !== 9 && (
+      {parseInt(urlSurahId) !== 1 && parseInt(urlSurahId) !== 9 && (
         <div className="text-black dark:text-teal-400">
           <Bismillah className="mx-auto" />
         </div>)}
@@ -187,13 +257,14 @@ function ArabicReading({ selectedRuku, rukus }) {
         ))}
       </div>
       
-      <NextPrev />
+      {/* <NextPrev /> */}
       {!isAudioPlayerDisabled && (
         <AudioPlayer 
           key={`audio-player-${surahData.surah.surah_id}`} 
           surahId={surahData.surah.surah_id} 
         />
       )}
+    </div>
     </div>
   );
 }
